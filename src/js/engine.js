@@ -10,7 +10,7 @@ const CONFIG = {
   CLOCK_BONUS: 30,
   COIN_POINTS: 50,
   PHASE_BONUS: 200,
-  API_URL: "https://api.anderson.grupo2.sd.ufersa.dev.br/score"
+  API_URL: "https://api.anderson.grupo5.sd.ufersa.dev.br/score"
 };
 
 const canvas = document.getElementById('game-canvas');
@@ -43,7 +43,7 @@ function initState() {
 }
 
 // ---- Lane Generation (columns) ----
-const PHASE1_LANES = ['safe','road','road','safe','water','water','safe','road','road','safe','road','road','safe'];
+const PHASE1_LANES = ['safe', 'road', 'road', 'safe', 'water', 'water', 'safe', 'road', 'road', 'safe', 'road', 'road', 'safe'];
 
 function generateLanes(phase) {
   const lanes = [];
@@ -69,7 +69,7 @@ function generateLanes(phase) {
 }
 
 // ---- Obstacles (move vertically in columns) ----
-const CAR_COLORS = ['#ef4444','#3b82f6','#f59e0b','#8b5cf6','#ec4899','#14b8a6'];
+const CAR_COLORS = ['#ef4444', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6'];
 function carColor() { return CAR_COLORS[Math.floor(Math.random() * CAR_COLORS.length)]; }
 
 function spawnObstacles() {
@@ -123,7 +123,7 @@ function moveFrog(dx, dy) {
 
   // Block only water → non-water (horizontal) if not aligned
   if (curLane && curLane.type === 'water' && dx !== 0 &&
-      destLane && destLane.type !== 'water' && Math.abs(G.frog.drift) > 1) {
+    destLane && destLane.type !== 'water' && Math.abs(G.frog.drift) > 1) {
     const currentPy = frogPixelY();
     const nearestRow = Math.round(currentPy / CONFIG.CELL);
     const offset = Math.abs(currentPy - nearestRow * CONFIG.CELL);
@@ -201,6 +201,13 @@ function checkFrogAlive(dt) {
       if (ob.col === G.frog.x && overlap(fr, ob.x, ob.y, ob.w, ob.h)) {
         onLog = true;
         G.frog.drift += ob.speed * dt * 60;
+        // Keep G.frog.y synced with visual position so drift stays small
+        const totalPy = G.frog.y * CONFIG.CELL + G.frog.drift;
+        const nearRow = Math.round(totalPy / CONFIG.CELL);
+        if (nearRow !== G.frog.y && nearRow >= 0 && nearRow < CONFIG.ROWS) {
+          G.frog.drift = totalPy - nearRow * CONFIG.CELL;
+          G.frog.y = nearRow;
+        }
         const py = frogPixelY();
         if (py < -CONFIG.CELL / 2 || py > (CONFIG.ROWS - 0.5) * CONFIG.CELL) { gameOver(); return; }
         break;
@@ -236,6 +243,7 @@ function update(dt) {
   G.particles = G.particles.filter(p => p.life > 0);
 
   checkFrogAlive(dt);
+  checkCollectibles(); // Check every frame (for water drift pickup)
   updateHUD();
 }
 
@@ -435,7 +443,7 @@ async function saveScore() {
     const res = await fetch(CONFIG.API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: name, score: G.score, phase: G.phase, time: new Date().toISOString() })
+      body: JSON.stringify({ username: name, score: G.score })
     });
     $saveStatus.textContent = res.ok ? '✓ Pontuação salva!' : '✗ Erro ao salvar';
     if (!res.ok) $saveStatus.className = 'save-status error';
@@ -475,7 +483,7 @@ document.addEventListener('keydown', e => {
     $pauseScreen.classList.toggle('hidden', !G.paused);
     return;
   }
-  const map = { ArrowUp: [0,-1], ArrowDown: [0,1], ArrowLeft: [-1,0], ArrowRight: [1,0] };
+  const map = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
   if (map[e.key]) { e.preventDefault(); moveFrog(map[e.key][0], map[e.key][1]); }
 });
 
@@ -493,7 +501,7 @@ let musicEnabled = false;
 function toggleMusic() {
   musicEnabled = !musicEnabled;
   $musicIcon.textContent = musicEnabled ? '\u{1F50A}' : '\u{1F507}';
-  if (musicEnabled) { bgMusic.play().catch(() => {}); }
+  if (musicEnabled) { bgMusic.play().catch(() => { }); }
   else { bgMusic.pause(); }
 }
 
@@ -503,13 +511,13 @@ function stopMusic() {
 }
 
 function startMusic() {
-  if (musicEnabled) { bgMusic.currentTime = 0; bgMusic.play().catch(() => {}); }
+  if (musicEnabled) { bgMusic.currentTime = 0; bgMusic.play().catch(() => { }); }
 }
 
 $btnMusic.addEventListener('click', toggleMusic);
 
 // ---- Mobile Touch Controls ----
-const dirMap = { up: [0,-1], down: [0,1], left: [-1,0], right: [1,0] };
+const dirMap = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 document.querySelectorAll('.dpad-btn[data-dir]').forEach(btn => {
   btn.addEventListener('touchstart', e => {
     e.preventDefault();
