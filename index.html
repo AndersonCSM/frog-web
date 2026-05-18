@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Frog Run - Um jogo arcade onde o sapo precisa atravessar a rua desviando de veículos e obstáculos.">
+  <title>Frog Run 🐸</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+  <div id="game-wrapper">
+    <!-- HUD -->
+    <header id="hud">
+      <div class="hud-item" id="hud-phase">
+        <span class="hud-label">FASE</span>
+        <span class="hud-value" id="phase-value">1</span>
+      </div>
+      <div class="hud-center">
+        <div class="hud-title">
+          <span class="title-icon">🐸</span>
+          <h1>FROG RUN</h1>
+        </div>
+        <button id="btn-music" class="btn-music" title="Música">
+          <span id="music-icon">🔇</span>
+        </button>
+      </div>
+      <div class="hud-right">
+        <div class="hud-item" id="hud-score">
+          <span class="hud-label">PONTOS</span>
+          <span class="hud-value" id="score-value">0</span>
+        </div>
+        <div class="hud-item" id="hud-timer">
+          <span class="hud-label">TEMPO</span>
+          <span class="hud-value" id="timer-value">05:00</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Game Canvas -->
+    <div id="canvas-container">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Start Screen Overlay -->
+      <div id="start-screen" class="overlay">
+        <div class="overlay-content">
+          <div class="overlay-frog">🐸</div>
+          <h2>FROG RUN</h2>
+          <p class="overlay-subtitle">Atravesse a rua e sobreviva!</p>
+          <div class="instructions">
+            <div class="key-row">
+              <kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd>
+              <span>Mover</span>
+            </div>
+            <div class="key-row">
+              <kbd>ESC</kbd>
+              <span>Pausar</span>
+            </div>
+          </div>
+          <div class="player-input">
+            <label for="player-name">Seu nome:</label>
+            <input type="text" id="player-name" maxlength="16" placeholder="Jogador" autocomplete="off">
+          </div>
+          <button id="btn-start" class="btn-glow">INICIAR JOGO</button>
+        </div>
+      </div>
+
+      <!-- Pause Overlay -->
+      <div id="pause-screen" class="overlay hidden">
+        <div class="overlay-content">
+          <h2>⏸️ PAUSADO</h2>
+          <p>Pressione <kbd>ESC</kbd> para continuar</p>
+        </div>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div id="gameover-screen" class="overlay hidden">
+        <div class="overlay-content">
+          <h2>FIM DE JOGO</h2>
+          <div id="final-stats">
+            <div class="stat-row"><span>Pontos</span><span id="final-score">0</span></div>
+            <div class="stat-row"><span>Fase</span><span id="final-phase">1</span></div>
+          </div>
+          <p id="save-status" class="save-status"></p>
+          <button id="btn-retry" class="btn-glow">TENTAR NOVAMENTE</button>
+        </div>
+      </div>
+
+      <!-- Phase Transition Overlay -->
+      <div id="phase-screen" class="overlay hidden">
+        <div class="overlay-content">
+          <h2 id="phase-announce">FASE 2</h2>
+          <p>Prepare-se!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls hint (desktop) -->
+    <footer id="controls-bar">
+      <span>← ↑ ↓ → Mover</span>
+      <span>ESC Pausar</span>
+    </footer>
+
+    <!-- Mobile D-pad -->
+    <div id="mobile-controls">
+      <div class="dpad">
+        <button class="dpad-btn dpad-up" data-dir="up">▲</button>
+        <div class="dpad-mid">
+          <button class="dpad-btn dpad-left" data-dir="left">◀</button>
+          <button class="dpad-btn dpad-pause" id="btn-pause-mobile">⏸</button>
+          <button class="dpad-btn dpad-right" data-dir="right">▶</button>
+        </div>
+        <button class="dpad-btn dpad-down" data-dir="down">▼</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/js/engine.js"></script>
+</body>
+</html>
